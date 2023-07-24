@@ -12,7 +12,7 @@ process run_fastqc {
     input:
         path fastq
     output:
-        path("fastqc_${fastq}_logs"), emit: fastqc_ch
+        path("fastqc_${fastq}_logs")
     script:
         """\
         mkdir -p fastqc_${fastq}_logs
@@ -20,6 +20,20 @@ process run_fastqc {
         """
 }
 
+process run_multiqc {
+    container = "${HOME}/singularity_images/multiqc_latest.sif"
+    publishDir params.outdir, mode: "copy"
+    input:
+        path("*")
+    output:
+        path("multiqc_report.html")
+    script:
+        """\
+        multiqc .
+        """
+}
+
 workflow {
     run_fastqc(fastq_list_ch)
+    run_multiqc(run_fastqc.out.collect())
 }
