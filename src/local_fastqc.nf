@@ -4,6 +4,7 @@ params.fastq = "${HOME}/nextflow_projects/nextflow_fastqc/data/*.fastq.gz"
 params.outdir = "${HOME}/nextflow_projects/nextflow_fastqc/res/fastqc"
 
 process run_fastqc {
+    tag "${fastq}"
     input:
         path fastq
     output:
@@ -18,5 +19,4 @@ process run_fastqc {
 workflow {
     fastq_list_ch = Channel.fromPath(params.fastq, checkIfExists: true)
     run_fastqc(fastq_list_ch)
-    run_fastqc.out.view()
 }
