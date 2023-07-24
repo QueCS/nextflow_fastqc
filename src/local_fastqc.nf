@@ -1,35 +1,22 @@
 #!/usr/bin/env nextflow
 
-params.reads = "${HOME}/nextflow_projects/nextflow_fastqc/data/*.fastq.gz"
-params.outdir = "${HOME}/nextflow_projects/nextflow_fastqc/res"
-
-log.info """\
-        
-        Parameters in use:
-        reads: ${params.reads}
-        outdir: ${params.outdir}
-        """
+params.fastq = "${HOME}/nextflow_projects/nextflow_fastqc/data/*.fastq.gz"
+params.outdir = "${HOME}/nextflow_projects/nextflow_fastqc/res/fastqc"
 
 process run_fastqc {
     input:
-        path reads from params.reads
+        path fastq
+    output:
+        path ""
     script:
-        """
-        fastqc ${reads} -o ${params.outdir}
+        """\
+        mkdir -p ${params.outdir}
+        fastqc ${fastq} -o ${params.outdir}
         """
 }
 
 workflow {
-    run_fastqc
-}
-
-workflow.onComplete {
-    log.info """\
-        Pipeline execution summary:
-        Completed at: ${workflow.complete}
-        Duration    : ${workflow.duration}
-        Success     : ${workflow.success}
-        workDir     : ${workflow.workDir}
-        exit status : ${workflow.exitStatus}
-        """
+    fastq_list_ch = Channel.fromPath(params.fastq, checkIfExists: true)
+    run_fastqc(fastq_list_ch)
+    run_fastqc.out.view()
 }
