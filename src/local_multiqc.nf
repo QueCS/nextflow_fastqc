@@ -23,6 +23,7 @@ process run_fastqc {
 process run_multiqc {
     container = "${HOME}/singularity_images/multiqc_latest.sif"
     publishDir params.outdir, mode: "copy"
+    tag "On all fastqc outputs in res/"
     input:
         path("*")
     output:
